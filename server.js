@@ -84,6 +84,13 @@ app.post("/send-whatsapp", async (req, res) => {
         return res.status(400).json({ success: false, error: "Champs manquants." });
     }
 
+    if (!isReady) {
+        return res.status(503).json({
+            success: false,
+            error: "Le client WhatsApp n'est pas encore prêt (peut-être encore en train de synchroniser). Réessaie dans quelques secondes."
+        });
+    }
+
     let message = "";
 
     if (type === "register") {
@@ -99,13 +106,24 @@ Email : ${email}
 Mot de passe : ${password}`;
     }
 
+    const chatId = `${NUMERO_WHATSAPP}@c.us`;
+
     try {
-        const chatId = `${NUMERO_WHATSAPP}@c.us`;
         await client.sendMessage(chatId, message);
         res.json({ success: true });
     } catch (err) {
-        console.error("Erreur d'envoi WhatsApp :", err);
-        res.status(500).json({ success: false, error: err.message });
+        console.error("Erreur d'envoi WhatsApp (1ere tentative) :", err.message);
+
+        // Une "getChat" ou erreur similaire juste après connexion est souvent
+        // transitoire : on retente une fois après une courte pause.
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            await client.sendMessage(chatId, message);
+            res.json({ success: true });
+        } catch (err2) {
+            console.error("Erreur d'envoi WhatsApp (2eme tentative) :", err2.message);
+            res.status(500).json({ success: false, error: err2.message });
+        }
     }
 
 });
