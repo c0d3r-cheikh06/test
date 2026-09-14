@@ -19,7 +19,16 @@ const client = new Client({
     puppeteer: {
         headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--disable-accelerated-2d-canvas",
+            "--no-first-run",
+            "--no-zygote",
+            "--single-process"
+        ]
     }
 });
 
@@ -44,7 +53,12 @@ client.on("disconnected", () => {
     console.log("Client WhatsApp déconnecté.");
 });
 
-client.initialize();
+let initError = null;
+
+client.initialize().catch((err) => {
+    initError = err.message;
+    console.error("Erreur au démarrage du client WhatsApp :", err);
+});
 
 // Page pour scanner le QR code depuis le navigateur (pratique en ligne,
 // pas besoin d'aller lire les logs du serveur)
@@ -52,6 +66,10 @@ app.get("/qr", async (req, res) => {
 
     if (isReady) {
         return res.send("<h2>Déjà connecté à WhatsApp ✅</h2>");
+    }
+
+    if (initError) {
+        return res.send(`<h2>Erreur au démarrage du client WhatsApp ❌</h2><pre>${initError}</pre>`);
     }
 
     if (!lastQr) {
