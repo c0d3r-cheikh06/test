@@ -1,15 +1,13 @@
 {
-  "name": "auth-whatsapp-exercise",
+  "name": "auth-notification-exercise",
   "version": "1.0.0",
-  "description": "Formulaire d'authentification qui envoie email/mot de passe sur WhatsApp automatiquement",
+  "description": "Formulaire d'authentification qui envoie email/mot de passe par email",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
     "express": "^4.19.2",
-    "qrcode": "^1.5.3",
-    "whatsapp-web.js": "latest"
+    "nodemailer": "^6.9.14"
   }
 }
