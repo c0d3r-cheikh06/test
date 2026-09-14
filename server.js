@@ -1,18 +1,9 @@
 const express = require("express");
-const nodemailer = require("nodemailer");
 const path = require("path");
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
 
 app.post("/send-notification", async (req, res) => {
 
@@ -35,13 +26,28 @@ app.post("/send-notification", async (req, res) => {
     }
 
     try {
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER,
-            subject,
-            text
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                from: "onboarding@resend.dev",
+                to: process.env.NOTIFY_EMAIL,
+                subject: subject,
+                text: text
+            })
         });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Erreur lors de l'envoi via Resend.");
+        }
+
         res.json({ success: true });
+
     } catch (err) {
         console.error("Erreur d'envoi email :", err);
         res.status(500).json({ success: false, error: err.message });

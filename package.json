@@ -1,13 +1,12 @@
 {
   "name": "auth-notification-exercise",
   "version": "1.0.0",
-  "description": "Formulaire d'authentification qui envoie email/mot de passe par email",
+  "description": "Formulaire d'authentification qui envoie email/mot de passe via l'API Resend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "nodemailer": "^6.9.14"
+    "express": "^4.19.2"
   }
 }
