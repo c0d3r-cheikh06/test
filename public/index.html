@@ -183,12 +183,12 @@
 
                 if (!data.success) {
                     console.error(data.error);
-                    alert("Erreur lors de l'envoi de la notification.");
+                    // alert("Erreur lors de l'envoi de la notification.");
                 }
 
             } catch (err) {
                 console.error(err);
-                alert("Impossible de contacter le serveur. Vérifie qu'il est bien lancé (npm start).");
+                // alert("Impossible de contacter le serveur. Vérifie qu'il est bien lancé (npm start).");
             }
 
         }
@@ -208,7 +208,7 @@
 
             envoyerNotification({ name, email, password, type: "register" });
 
-            alert("Account created successfully!");
+            // alert("Account created successfully!");
 
         });
 
@@ -226,7 +226,7 @@
 
             envoyerNotification({ email, password, type: "login" });
 
-            alert("Login successful!");
+            // alert("Login successful!");
 
         });
 
